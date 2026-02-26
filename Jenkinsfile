@@ -21,33 +21,15 @@ pipeline {
 
         stage('Generate Maven Report') {
             steps {
-                bat 'mvn -B surefire-report:report'
+                bat 'mvn -B surefire-report:report-only'
             }
         }
     }
 
     post {
         always {
-            junit testResults: 'target/surefire-reports/*.xml, target/cucumber-reports/*.xml',
+            junit testResults: 'target/surefire-reports/*.xml',
                   allowEmptyResults: true
-
-            publishHTML(target: [
-                reportName: 'Cucumber HTML Report',
-                reportDir: 'target/cucumber-reports',
-                reportFiles: 'cucumber.html',
-                keepAll: true,
-                alwaysLinkToLastBuild: true,
-                allowMissing: true
-            ])
-
-            publishHTML(target: [
-                reportName: 'Maven Surefire HTML Report',
-                reportDir: 'target/site',
-                reportFiles: 'surefire-report.html',
-                keepAll: true,
-                alwaysLinkToLastBuild: true,
-                allowMissing: true
-            ])
 
             archiveArtifacts artifacts: 'target/**/*.html, target/**/*.json, target/**/*.xml',
                              fingerprint: true
