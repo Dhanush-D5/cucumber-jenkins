@@ -1,4 +1,4 @@
-name: CI - Cucumber Tests
+name: CI - Cucumber
 
 on:
   push:
@@ -18,27 +18,15 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'     # change to 11/21 if your project needs it
-          cache: 'maven'
+          distribution: temurin
+          java-version: "17"
+          cache: maven
 
-      # If your tests need Chrome (Selenium/WebDriver), uncomment the next two steps
-      # - name: Install Chrome
-      #   uses: browser-actions/setup-chrome@v1
-      #
-      # - name: Start Xvfb (headless display for UI tests)
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y xvfb
-      #     Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-      #     echo "DISPLAY=:99" >> $GITHUB_ENV
-
-      - name: Build & Test (Maven)
+      - name: Build & Test
         run: |
           mvn -B -ntp clean test
-        # If your cucumber runner generates a json, make sure surefire/cucumber plugin is configured
 
-      - name: Upload Surefire/TestNG reports
+      - name: Upload Surefire reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -47,7 +35,6 @@ jobs:
             **/target/surefire-reports/**
             **/target/failsafe-reports/**
 
-      # Upload cucumber.json if generated (adjust path to match your project)
       - name: Upload Cucumber JSON
         if: always()
         uses: actions/upload-artifact@v4
@@ -58,7 +45,6 @@ jobs:
             **/target/cucumber-report*.json
           if-no-files-found: ignore
 
-      # Upload HTML report directory if you generate one (e.g., cucumber-html-reports)
       - name: Upload Cucumber HTML
         if: always()
         uses: actions/upload-artifact@v4
@@ -66,7 +52,7 @@ jobs:
           name: cucumber-html
           path: |
             **/target/cucumber-html-reports/**
-            **/target/cucumber-report/** 
+            **/target/cucumber-report/**
             **/target/site/**
           if-no-files-found: ignore
 ``
