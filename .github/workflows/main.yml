@@ -55,4 +55,3 @@ jobs:
             **/target/cucumber-report/**
             **/target/site/**
           if-no-files-found: ignore
-``
