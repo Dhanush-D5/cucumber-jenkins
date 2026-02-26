@@ -28,11 +28,16 @@ pipeline {
 
     post {
         always {
-            junit testResults: 'target/surefire-reports/*.xml',
-                  allowEmptyResults: true
+            testNG(
+                reportFilenamePattern: '**/testng-results.xml',
+                escapeTestDescp: true,
+                escapeExceptionMsg: true,
+                showFailedBuilds: true
+            )
 
-            archiveArtifacts artifacts: 'target/**/*.html, target/**/*.json, target/**/*.xml',
-                             fingerprint: true
+            archiveArtifacts artifacts: 'target/**/*.html, target/**/*.json, target/**/*.xml, **/testng-results.xml',
+                             fingerprint: true,
+                             allowEmptyArchive: true
         }
     }
 }
