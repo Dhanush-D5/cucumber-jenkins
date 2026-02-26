@@ -1,0 +1,72 @@
+name: CI - Cucumber Tests
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'     # change to 11/21 if your project needs it
+          cache: 'maven'
+
+      # If your tests need Chrome (Selenium/WebDriver), uncomment the next two steps
+      # - name: Install Chrome
+      #   uses: browser-actions/setup-chrome@v1
+      #
+      # - name: Start Xvfb (headless display for UI tests)
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y xvfb
+      #     Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+      #     echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      - name: Build & Test (Maven)
+        run: |
+          mvn -B -ntp clean test
+        # If your cucumber runner generates a json, make sure surefire/cucumber plugin is configured
+
+      - name: Upload Surefire/TestNG reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: |
+            **/target/surefire-reports/**
+            **/target/failsafe-reports/**
+
+      # Upload cucumber.json if generated (adjust path to match your project)
+      - name: Upload Cucumber JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json
+          path: |
+            **/target/cucumber*.json
+            **/target/cucumber-report*.json
+          if-no-files-found: ignore
+
+      # Upload HTML report directory if you generate one (e.g., cucumber-html-reports)
+      - name: Upload Cucumber HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-html
+          path: |
+            **/target/cucumber-html-reports/**
+            **/target/cucumber-report/** 
+            **/target/site/**
+          if-no-files-found: ignore
+``
